@@ -1,9 +1,19 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
-import { getMetricMetaInfo } from '../utils/helpers';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { getMetricMetaInfo, timeToString } from '../utils/helpers';
 import UdaciSlider from './UdaciSlider';
 import UdaciSteppers from './UdaciSteppers';
-import DateHeader from './DateHeader'
+import DateHeader from './DateHeader';
+import { Ionicons } from '@expo/vector-icons';
+import TextButton from './TextButton';
+
+function SubmitBtn({onPress}) {
+    return (
+        <TouchableOpacity>
+            <Text onPress={onPress}>Submit</Text>
+        </TouchableOpacity>
+    )
+}
 
 export default class AddEntry extends Component {
 
@@ -41,18 +51,58 @@ export default class AddEntry extends Component {
     }
 
     slide = (metric, newValue) => {
-        this.setState=(()=>({
+        this.setState=((currentState)=>({
+            ...currentState,
             [metric]: newValue
         }))
+    }
+
+    submit = () => {
+        const key = timeToString();
+        const entry = this.state;
+
+        // todo: update redux, navigate to home, save info to database, clear local notification
+
+        this.setState(() => ({
+            run: 0,
+            bike: 0,
+            swim: 0,
+            sleep: 0,
+            eat: 0
+        }));
+    }
+
+    reset = () => {
+        const key = timeToString();
+
+        // todo: update redux, navigate to home, save info to database, 
     }
 
     render(){
 
         const metaInfo = getMetricMetaInfo();
-        
+
+        if(this.props.alreadyLogged){
+            return (
+                <View>
+                    <Ionicons 
+                        name='ios-happy'
+                        size={100}
+                    />
+                    <Text>
+                        You already logged your info for today.
+                    </Text>
+                    <TextButton onPress={this.reset}>
+                        Reset
+                    </TextButton>
+                </View>
+            )
+        }
+
         return(
             <View>
                 <DateHeader date={(new Date()).tolocaleDatestring}/>
+
                 {/* returns an array of keys (each metric) */}
                 {Object.keys(metaInfo).map((key) => {
                     const { getIcon, type, ...rest } = metaInfo[key];
@@ -78,6 +128,7 @@ export default class AddEntry extends Component {
                         </View>
                     )
                 })}
+                <SubmitBtn onPress={this.submit} />
             </View>
         )
     }

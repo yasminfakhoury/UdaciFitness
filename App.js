@@ -5,7 +5,7 @@ import { getMetricMetaInfo } from './utils/helpers.js';
 
 export default function App() {
   return (
-    <View style = {style.container}>
+    <View>
       <AddEntry />
     </View>
   );
